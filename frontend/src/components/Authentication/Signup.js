@@ -29,8 +29,7 @@ const Signup = () => {
       toast({
         title: "Please Fill all the Fields",
         status: "warning",
-        duration: 5000
-        ,
+        duration: 5000,
         isClosable: true,
         position: "bottom",
       });
@@ -134,167 +133,166 @@ const Signup = () => {
   };
 
   return (
-    <Flex 
-      minHeight="100vh"
-      width="100%"
-      align="center"
-      justify="center"
-      bg="#0f1924"
-    >
-      <Box
-        bg="#1b3046ff"
-        width={["90%", "90%","90%","70%"]}
-        p={8}
-        borderRadius="lg"
-        boxShadow="lg"
-        
+    <div className="">
+      <Stack
+        direction={["column", "column", "row"]}
+        spacing={8}
+        align="center"
+        justify="center"
+        pb={3}
       >
-        <Text
-          textAlign="center"
-          fontSize="4xl"
-          fontWeight="600"
-          fontFamily="head"
-          textColor="#fff"
-        >Create Your Account</Text>
-        <Stack
-          direction={["column", "column", "row"]} 
-          spacing={8} 
-          align="center" 
-          justify="center"
-        >
-          <Box
-            width={["100%", "100%", "60%"]}
-          >
-            <VStack spacing="5px" >
-              <FormControl id="first-name" isRequired>
-                <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">Name</FormLabel>
+        <Box width={["100%", "100%", "60%"]}>
+          <VStack spacing="5px">
+            <FormControl id="first-name" isRequired>
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+                Name
+              </FormLabel>
+              <Input
+                fontFamily="content"
+                bg="#21364a"
+                border="none"
+                placeholder="Enter Your Name"
+                onChange={(e) => setName(e.target.value)}
+              />
+            </FormControl>
+            <FormControl id="email" isRequired>
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+                Email Address
+              </FormLabel>
+              <Input
+                fontFamily="content"
+                type="email"
+                bg="#21364a"
+                border="none"
+                placeholder="Enter Your Email Address"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </FormControl>
+            <FormControl id="password" isRequired>
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+                Password
+              </FormLabel>
+              <InputGroup size="md">
                 <Input
                   fontFamily="content"
                   bg="#21364a"
                   border="none"
-                  placeholder="Enter Your Name"
-                  onChange={(e) => setName(e.target.value)}
+                  type={show ? "text" : "password"}
+                  placeholder="Enter Password"
+                  onChange={(e) => setPassword(e.target.value)}
                 />
-              </FormControl>
-              <FormControl id="email" isRequired>
-                <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">Email Address</FormLabel>
-                <Input
-                  fontFamily="content"
-                  type="email"
-                  bg="#21364a"
-                  border="none"
-                  placeholder="Enter Your Email Address"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </FormControl>
-              <FormControl id="password" isRequired>
-                <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">Password</FormLabel>
-                <InputGroup size="md">
-                  <Input
-                    fontFamily="content"
-                    bg="#21364a"
-                    border="none"
-                    type={show ? "text" : "password"}
-                    placeholder="Enter Password"
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <InputRightElement width="4.5rem">
-                    <Button h="1.75rem" size="sm" onClick={handleClick}>
-                      {show ? "Hide" : "Show"}
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-              </FormControl>
-              <FormControl id="password" isRequired>
-                <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">Confirm Password</FormLabel>
-                <InputGroup size="md">
-                  <Input
-                    fontFamily="content"
-                    bg="#21364a"
-                    border="none"
-                    type={show ? "text" : "password"}
-                    placeholder="Confirm password"
-                    onChange={(e) => setConfirmpassword(e.target.value)}
-                  />
-                  <InputRightElement width="4.5rem">
-                    <Button h="1.75rem" size="sm" onClick={handleClick}>
-                      {show ? "Hide" : "Show"}
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-              </FormControl>
-              <FormControl id="pic">
-                <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">Upload your Picture</FormLabel>
-                <Box position="relative" width="100%">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => postDetails(e.target.files[0])}
-                    position="absolute"
-                    left={0}
-                    top={0}
-                    width="100%"
-                    height="100%"
-                    opacity={0}
-                    zIndex={2}
-                    cursor="pointer"
-                  />
+                <InputRightElement width="4.5rem">
                   <Button
-                    as="span"
-                    bg="#05549e"
-                    color="white"
-                    width="100%"
-                    fontFamily="subhead"
-                    _hover={{ bg: "#0c77dbff" }}
-                    zIndex={1}
+                    h="1.75rem"
+                    size="sm"
+                    fontFamily="content"
+                    bg="#1b3046ff"
+                    textColor="white"
+                    _hover="none"
+                    onClick={handleClick}
                   >
-                    Choose Profile Photo
+                    {show ? "Hide" : "Show"}
                   </Button>
-                </Box>
-              </FormControl>
-              
-            </VStack>
-          </Box>
-          <Box
-            width={["100%", "100%", "60%"]}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            mt={[8, 8, 0]}
-          >
-            <Image
-              src={signupimg}
-              alt="Description"
-              boxSize={["270px", "300px", "350px"]}
-              objectFit="cover"
-              borderRadius="lg"  
-            />
-          </Box>
-          
-         
-          
-        </Stack>
-        <Button
-          bg="#05549e"
-          width="80%"
-          alignItems="center"
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
+            <FormControl id="password" isRequired>
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+                Confirm Password
+              </FormLabel>
+              <InputGroup size="md">
+                <Input
+                  fontFamily="content"
+                  bg="#21364a"
+                  border="none"
+                  type={show ? "text" : "password"}
+                  placeholder="Confirm password"
+                  onChange={(e) => setConfirmpassword(e.target.value)}
+                />
+                <InputRightElement width="4.5rem">
+                  <Button
+                    h="1.75rem"
+                    size="sm"
+                    fontFamily="content"
+                    bg="#1b3046ff"
+                    textColor="white"
+                    _hover="none"
+                    onClick={handleClick}
+                  >
+                    {show ? "Hide" : "Show"}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
+            <FormControl id="pic">
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+                Upload your Picture
+              </FormLabel>
+              <Box position="relative" width="100%">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => postDetails(e.target.files[0])}
+                  position="absolute"
+                  left={0}
+                  top={0}
+                  width="100%"
+                  height="100%"
+                  opacity={0}
+                  zIndex={2}
+                  cursor="pointer"
+                />
+                <Button
+                  as="span"
+                  bg="#05549e"
+                  color="white"
+                  width="100%"
+                  fontFamily="subhead"
+                  _hover={{ bg: "#0c77dbff" }}
+                  zIndex={1}
+                >
+                  Choose Profile Photo
+                </Button>
+              </Box>
+            </FormControl>
+          </VStack>
+        </Box>
+        <Box
+          width={["100%", "100%", "60%"]}
+          display="flex"
           justifyContent="center"
-          rounded={50}
-          style={{ marginTop: 15 }}
-          onClick={submitHandler}
-          isLoading={picLoading}
-          textColor="white"
-          fontFamily="subhead"
-          _hover={{ bg: "#025fb6ff" }}
-          mx="auto"
-          display="block"
+          alignItems="center"
+          mt={[8, 8, 0]}
         >
-          Sign Up
-        </Button>
-      </Box>
-      
-    </Flex>
-    
+          <Image
+            src={signupimg}
+            alt="Description"
+            boxSize={["270px", "300px", "350px"]}
+            objectFit="cover"
+            borderRadius="lg"
+          />
+        </Box>
+      </Stack>
+      <Button
+        bg="#05549e"
+        color="white"
+        zIndex={1}
+        width="80%"
+        alignItems="center"
+        justifyContent="center"
+        rounded={10}
+        style={{ marginTop: 15 }}
+        onClick={submitHandler}
+        isLoading={picLoading}
+        textColor="white"
+        fontFamily="subhead"
+        _hover={{ bg: "#025fb6ff" }}
+        mx="auto"
+        display="block"
+      >
+        Sign Up
+      </Button>
+    </div>
   );
 };
 
