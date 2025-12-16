@@ -19,6 +19,16 @@ const ChatProvider = ({ children }) => {
     setUser(userInfo);
 
     if (!userInfo) navigate("/");
+    
+    // Restore selected chat from localStorage
+    const savedChat = localStorage.getItem("selectedChat");
+    if (savedChat) {
+      try {
+        setSelectedChat(JSON.parse(savedChat));
+      } catch (e) {
+        console.error('Error parsing saved chat:', e);
+      }
+    }
   }, [navigate]);
 
   useEffect(() => {
@@ -152,11 +162,21 @@ const ChatProvider = ({ children }) => {
     }
   };
 
+  // Wrapper to save selectedChat to localStorage
+  const updateSelectedChat = (chat) => {
+    setSelectedChat(chat);
+    if (chat) {
+      localStorage.setItem("selectedChat", JSON.stringify(chat));
+    } else {
+      localStorage.removeItem("selectedChat");
+    }
+  };
+
   return (
     <ChatContext.Provider
       value={{
         selectedChat,
-        setSelectedChat,
+        setSelectedChat: updateSelectedChat,
         user,
         setUser,
         notification,
