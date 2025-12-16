@@ -36,7 +36,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
-  
+  const [pendingMessages, setPendingMessages] = useState([]);
+
   // Use ref to track the currently selected chat for socket listeners
   const selectedChatCompareRef = useRef();
 
@@ -83,8 +84,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setMessages(data);
       setLoading(false);
 
-      console.log('Joining chat room:', selectedChat._id);
-      console.log('Socket connected:', socket.connected);
+      console.log("Joining chat room:", selectedChat._id);
+      console.log("Socket connected:", socket.connected);
       socket.emit("join chat", selectedChat._id);
     } catch (error) {
       toast({
@@ -191,12 +192,34 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const sendMessage = async (event) => {
     // Check if it's an Enter key press or a direct call (button click)
     const shouldSend = !event || event.key === "Enter";
-    
+
     if (shouldSend && newMessage) {
-      console.log('Sending message:', newMessage);
-      console.log('Socket connected:', socket.connected);
-      
+      console.log("Sending message:", newMessage);
+      console.log("Socket connected:", socket.connected);
+
+      const messageContent = newMessage;
+      const tempId = `temp-${Date.now()}`;
+
+      // Create a pending message for optimistic UI
+      const pendingMessage = {
+        _id: tempId,
+        content: messageContent,
+        sender: {
+          _id: user._id,
+          name: user.name,
+          pic: user.pic,
+        },
+        chat: selectedChat,
+        isPending: true,
+        createdAt: new Date().toISOString(),
+      };
+
       socket.emit("stop typing", selectedChat._id);
+
+      // Clear input and add pending message immediately for instant feedback
+      setNewMessage("");
+      setPendingMessages((prev) => [...prev, pendingMessage]);
+
       try {
         const config = {
           headers: {
@@ -204,25 +227,36 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             Authorization: `Bearer ${user.token}`,
           },
         };
+
         const { data } = await axios.post(
           `${API_URL}/message`,
           {
-            content: newMessage,
+            content: messageContent,
             chatId: selectedChat._id,
           },
           config
         );
-        
-        console.log('💾 Message saved to DB:', data);
+
+        console.log("💾 Message saved to DB:", data);
         console.log('📤 Emitting "new message" event to socket');
-        console.log('👥 Chat users:', data.chat?.users);
+        console.log("👥 Chat users:", data.chat?.users);
+
+        // Remove pending message and add real message
+        setPendingMessages((prev) => prev.filter((msg) => msg._id !== tempId));
+        setMessages((prevMessages) => {
+          // Avoid duplicates - check if message already exists
+          if (!prevMessages.some((msg) => msg._id === data._id)) {
+            return [...prevMessages, data];
+          }
+          return prevMessages;
+        });
+
         socket.emit("new message", data);
-        
-        // Update messages in state immediately for sender
-        setMessages((prevMessages) => [...prevMessages, data]);
-        setNewMessage("");
       } catch (error) {
-        console.error('Error sending message:', error);
+        console.error("Error sending message:", error);
+        // Remove pending message and restore message in input on error
+        setPendingMessages((prev) => prev.filter((msg) => msg._id !== tempId));
+        setNewMessage(messageContent);
         toast({
           title: "Error Occurred!",
           description: "Failed to send the Message",
@@ -238,20 +272,20 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   useEffect(() => {
     // Connect socket if not already connected
     if (!socket.connected) {
-      console.log('Connecting socket...');
+      console.log("Connecting socket...");
       socket.connect();
     }
-    
+
     socket.emit("setup", user);
-    
+
     const handleConnected = () => {
-      console.log('Socket connected successfully');
+      console.log("Socket connected successfully");
       setSocketConnected(true);
     };
-    
+
     const handleTyping = () => setIsTyping(true);
     const handleStopTyping = () => setIsTyping(false);
-    
+
     socket.on("connected", handleConnected);
     socket.on("typing", handleTyping);
     socket.on("stop typing", handleStopTyping);
@@ -267,7 +301,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     fetchMessages();
-    
+
     // Update the ref when selectedChat changes
     selectedChatCompareRef.current = selectedChat;
     // eslint-disable-next-line
@@ -275,23 +309,38 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     const handleMessageReceived = (newMessageRecieved) => {
-      console.log('📨 Message received from socket:', newMessageRecieved);
-      console.log('📋 Current selected chat:', selectedChatCompareRef.current);
-      
+      console.log("📨 Message received from socket:", newMessageRecieved);
+      console.log("📋 Current selected chat:", selectedChatCompareRef.current);
+
       if (
         !selectedChatCompareRef.current ||
         selectedChatCompareRef.current._id !== newMessageRecieved.chat._id
       ) {
         // Message is for a different chat - add to notifications
-        console.log('🔔 Message is for different chat - adding to notifications');
-        if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
-          setFetchAgain(!fetchAgain);
-        }
+        console.log(
+          "🔔 Message is for different chat - adding to notifications"
+        );
+        setNotification((prevNotifications) => {
+          if (
+            !prevNotifications.some(
+              (notif) => notif._id === newMessageRecieved._id
+            )
+          ) {
+            return [newMessageRecieved, ...prevNotifications];
+          }
+          return prevNotifications;
+        });
+        setFetchAgain((prev) => !prev);
       } else {
         // Message is for current chat - display it immediately
-        console.log('✅ Message is for current chat - displaying in real-time');
-        setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
+        console.log("✅ Message is for current chat - displaying in real-time");
+        setMessages((prevMessages) => {
+          // Avoid duplicates - check if message already exists
+          if (!prevMessages.some((msg) => msg._id === newMessageRecieved._id)) {
+            return [...prevMessages, newMessageRecieved];
+          }
+          return prevMessages;
+        });
       }
     };
 
@@ -304,7 +353,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       socket.off("message recieved", handleMessageReceived);
       console.log('🔇 Socket listener removed for "message recieved"');
     };
-  }, [notification, fetchAgain]);
+  }, []); // Empty dependency array since we're using functional updates
 
   // Close search dropdown when clicking outside
   useEffect(() => {
@@ -362,9 +411,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       {/* Chat area fills remaining space */}
       <Box flex={1} height="100vh">
         {selectedChat ? (
-          <Box d="flex" flexDir="column" bg="#0b1219ff" w="100%" height="100vh">
+          <Box d="flex" flexDir="column" bg="#0f1924" w="100%" height="100vh">
             <Box
-              bg="transparent"
+              bg="#0b1219ff"
               display="flex"
               flexDirection="row"
               alignItems={"center"}
@@ -701,26 +750,29 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               </Box>
             </Box>
             <Box
-              d="flex"
+              display="flex"
               flexDir="column"
               bg="transparent"
               w="100%"
-              h="90%"
-              position="relative"
+              height="calc(100vh - 80px)"
+              overflow="hidden"
             >
               {loading ? (
-                <Spinner
-                  size="xl"
-                  w={20}
-                  h={20}
-                  alignSelf="center"
-                  margin="auto"
-                />
+                <Box
+                  flex="1"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Spinner size="xl" w={20} h={20} />
+                </Box>
               ) : (
-                <Box 
+                <Box
                   scrollBehavior={"smooth"}
                   overflowY={"auto"}
-                  maxHeight={"calc(100vh - 134px)"}
+                  flex="1"
+                  minHeight="100%"
+                  pb="90px"
                   sx={{
                     // Custom scrollbar styling for webkit browsers
                     "&::-webkit-scrollbar": {
@@ -752,7 +804,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     scrollbarColor: "#21364A rgba(15, 25, 36, 0.5)",
                   }}
                 >
-                  <ScrollableChat messages={messages} />
+                  <ScrollableChat
+                    messages={messages}
+                    pendingMessages={pendingMessages}
+                  />
                 </Box>
               )}
 
@@ -760,12 +815,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 onKeyDown={sendMessage}
                 id="first-name"
                 isRequired
-                position="sticky"
+                position="absolute"
                 bottom="0"
+                left="0"
+                right="0"
                 width="100%"
                 px={3}
                 py={3}
                 bg="#0b1219ff"
+                zIndex={10}
               >
                 {istyping ? <div>typing...</div> : <></>}
                 <div
