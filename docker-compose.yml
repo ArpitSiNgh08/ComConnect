@@ -76,6 +76,12 @@ services:
     environment:
       - REACT_APP_API_URL=http://localhost:5000
       - REACT_APP_SOCKET_URL=http://localhost:5000
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./frontend/src:/app/frontend/src
+      - ./frontend/public:/app/frontend/public
+      - /app/frontend/node_modules
 
 networks:
   app_network:
