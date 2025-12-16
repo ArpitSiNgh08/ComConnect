@@ -144,7 +144,7 @@ const Signup = () => {
         <Box width={["100%", "100%", "60%"]}>
           <VStack spacing="5px">
             <FormControl id="first-name" isRequired>
-              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="white">
                 Name
               </FormLabel>
               <Input
@@ -152,11 +152,12 @@ const Signup = () => {
                 bg="#21364a"
                 border="none"
                 placeholder="Enter Your Name"
+                textColor="white"
                 onChange={(e) => setName(e.target.value)}
               />
             </FormControl>
             <FormControl id="email" isRequired>
-              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="white">
                 Email Address
               </FormLabel>
               <Input
@@ -164,12 +165,13 @@ const Signup = () => {
                 type="email"
                 bg="#21364a"
                 border="none"
+                textColor="white"
                 placeholder="Enter Your Email Address"
                 onChange={(e) => setEmail(e.target.value)}
               />
             </FormControl>
             <FormControl id="password" isRequired>
-              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="white">
                 Password
               </FormLabel>
               <InputGroup size="md">
@@ -177,6 +179,7 @@ const Signup = () => {
                   fontFamily="content"
                   bg="#21364a"
                   border="none"
+                  textColor="white"
                   type={show ? "text" : "password"}
                   placeholder="Enter Password"
                   onChange={(e) => setPassword(e.target.value)}
@@ -188,7 +191,7 @@ const Signup = () => {
                     fontFamily="content"
                     bg="#1b3046ff"
                     textColor="white"
-                    _hover="none"
+                    _hover={{ textColor: "black", bg: "gray.300" }}
                     onClick={handleClick}
                   >
                     {show ? "Hide" : "Show"}
@@ -197,7 +200,7 @@ const Signup = () => {
               </InputGroup>
             </FormControl>
             <FormControl id="password" isRequired>
-              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="white">
                 Confirm Password
               </FormLabel>
               <InputGroup size="md">
@@ -205,6 +208,7 @@ const Signup = () => {
                   fontFamily="content"
                   bg="#21364a"
                   border="none"
+                  textColor="white"
                   type={show ? "text" : "password"}
                   placeholder="Confirm password"
                   onChange={(e) => setConfirmpassword(e.target.value)}
@@ -216,7 +220,7 @@ const Signup = () => {
                     fontFamily="content"
                     bg="#1b3046ff"
                     textColor="white"
-                    _hover="none"
+                    _hover={{ textColor: "black", bg: "gray.300" }}
                     onClick={handleClick}
                   >
                     {show ? "Hide" : "Show"}
@@ -225,7 +229,7 @@ const Signup = () => {
               </InputGroup>
             </FormControl>
             <FormControl id="pic">
-              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="lgrey">
+              <FormLabel mb={0} mt={3} fontFamily="subhead" textColor="white">
                 Upload your Picture
               </FormLabel>
               <Box position="relative" width="100%">

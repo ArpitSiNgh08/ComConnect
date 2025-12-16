@@ -137,6 +137,7 @@ const Login = () => {
                 fontFamily="content"
                 bg="#21364a"
                 border="none"
+                textColor="white"
               />
             </FormControl>
             <FormControl id="password" isRequired>
@@ -152,6 +153,7 @@ const Login = () => {
                   fontFamily="content"
                   bg="#21364a"
                   border="none"
+                  textColor="white"
                 />
                 <InputRightElement width="4.5rem">
                   <Button
@@ -162,13 +164,14 @@ const Login = () => {
                     fontFamily="content"
                     bg="#1b3046ff"
                     textColor="white"
-                    _hover="none"
+                    _hover={{ textColor: "black", bg: "gray.300" }}
                   >
                     {show ? "Hide" : "Show"}
                   </Button>
                 </InputRightElement>
               </InputGroup>
-              <span className="text-white font-light text-[14px] leading-[0px] "
+              <span
+                className="text-white font-light text-[14px] leading-[0px] "
                 children="By signing up, you are creating a COMCONNECT account, and you
                 agree to COMCONNECT's Term of Use and Privacy Policy."
               />
