@@ -105,12 +105,6 @@ const MyWorkspaces = () => {
                 borderRadius="lg"
                 p={6}
                 cursor="pointer"
-                transition="all 0.3s"
-                _hover={{
-                  borderColor: "#21364A",
-                  transform: "translateY(-4px)",
-                  boxShadow: "0 4px 12px rgba(41, 130, 219, 0.2)",
-                }}
                 onClick={() => handleSelectWorkspace(workspace)}
               >
                 <VStack align="start" spacing={4} width="100%">
