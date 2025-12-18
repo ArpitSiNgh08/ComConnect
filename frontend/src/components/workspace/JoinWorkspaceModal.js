@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useToast } from "@chakra-ui/react";
 import {
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button,
   FormControl,
+  FormLabel,
   Input,
+  Button,
   useDisclosure,
+  VStack,
+  Text,
+  Box,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { ChatState } from "../../Context/ChatProvider";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { joinspace } from "../../utils/media/media";
+import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../config/api.config";
 
 const JoinWorkspaceModal = ({ children }) => {
@@ -112,45 +114,72 @@ const JoinWorkspaceModal = ({ children }) => {
     <>
       <span onClick={onOpen}>{children}</span>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <img
-            className="join_workspace_img"
-            width={350}
-            height={200}
-            src={joinspace}
-            alt="workspace"
-          />
-          <ModalHeader>Join Workspace</ModalHeader>
-          <ModalCloseButton />
+      <Modal size="lg" isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay bg="blackAlpha.700" />
+        <ModalContent
+          pb={4}
+          pt={1}
+          bg="#0F1924"
+          color="white"
+          border="1px solid"
+          borderColor="#2982db20"
+        >
+          <ModalHeader color="white">Join Workspace</ModalHeader>
+          <ModalCloseButton color="white" _hover={{ bg: "#21364A" }} />
+
           <ModalBody>
-            <FormControl id="workspace-id" isRequired>
-              <Input
-                placeholder="Enter Workspace ID"
-                onChange={(e) => setWorkspaceId(e.target.value)}
-              />
-            </FormControl>
-            <FormControl id="role" isRequired mt={4}>
-              <Input
-                placeholder="Enter Role Name"
-                onChange={(e) => setRoleName(e.target.value)}
-              />
-            </FormControl>
+            <VStack spacing={4} align="stretch">
+              <FormControl isRequired>
+                <FormLabel color="gray.300">Workspace ID</FormLabel>
+                <Input
+                  placeholder="Enter Workspace ID"
+                  value={workspaceId}
+                  onChange={(e) => setWorkspaceId(e.target.value)}
+                  bg="#0F1924"
+                  borderColor="#2982db20"
+                  col or="white"
+                  _placeholder={{ color: "gray.400" }}
+                  _hover={{ borderColor: "#2982db40" }}
+                  _focus={{
+                    borderColor: "#21364A",
+                    boxShadow: "0 0 0 1px #21364A",
+                    bg: "#131f2bff",
+                  }}
+                />
+              </FormControl>
+
+              <FormControl isRequired>
+                <FormLabel color="gray.300">Role Name</FormLabel>
+                <Input
+                  placeholder="Enter Role Name"
+                  value={roleName}
+                  onChange={(e) => setRoleName(e.target.value)}
+                  bg="#0F1924"
+                  borderColor="#2982db20"
+                  color="white"
+                  _placeholder={{ color: "gray.400" }}
+                  _hover={{ borderColor: "#2982db40" }}
+                  _focus={{
+                    borderColor: "#21364A",
+                    boxShadow: "0 0 0 1px #21364A",
+                    bg: "#131f2bff",
+                  }}
+                />
+              </FormControl>
+
+              <Button
+                bg="#21364A"
+                color="white"
+                _hover={{ bg: "#192937ff" }}
+                _active={{ bg: "#192937ff" }}
+                onClick={joinWorkspace}
+                isLoading={loading}
+                mt={4}
+              >
+                Join Workspace
+              </Button>
+            </VStack>
           </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={joinWorkspace}
-              isLoading={loading}
-            >
-              Join
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
-              Cancel
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </>

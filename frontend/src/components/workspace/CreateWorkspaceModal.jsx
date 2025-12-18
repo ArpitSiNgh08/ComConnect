@@ -1,28 +1,70 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import emailjs from "emailjs-com";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input,
+  Button,
+  Stack,
+  Box,
+  List,
+  ListItem,
+  Tag,
+  TagLabel,
+  TagCloseButton,
+  HStack,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { useWorkspace } from "../../Context/WorkspaceProvider";
 import { useNavigate } from "react-router-dom";
-import { workspace } from "../../utils/media/media";
-import "./workspace.css";
 import { API_URL } from "../../config/api.config";
-import { Button } from "@chakra-ui/button";
 
 const CreateWorkspaceModal = ({ onClose }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [workspaceName, setWorkspaceName] = useState("");
   const [roles, setRoles] = useState([]);
+  const [roleInput, setRoleInput] = useState("");
   const [roleList, setRoleList] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
   const [emails, setEmails] = useState("");
   const { user } = useWorkspace();
   const [workspaceId, setWorkspaceId] = useState(null);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const token =
     user?.token || JSON.parse(localStorage.getItem("userInfo"))?.token;
 
   const createWorkspace = async () => {
+    if (!workspaceName.trim()) {
+      toast({
+        title: "Workspace name is required",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (roles.length === 0) {
+      toast({
+        title: "Please add at least one role",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
       const response = await axios.post(
         `${API_URL}/workspace`,
@@ -31,9 +73,23 @@ const CreateWorkspaceModal = ({ onClose }) => {
       );
       console.log("Workspace created:", response.data);
       setWorkspaceId(response.data.workspace._id);
+      toast({
+        title: "Workspace Created",
+        description: "Your workspace has been successfully created.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
       setStep(2);
     } catch (error) {
       console.error("Error creating workspace:", error);
+      toast({
+        title: "Error creating workspace",
+        description: error.response?.data?.message || "Failed to create workspace",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -78,8 +134,40 @@ const CreateWorkspaceModal = ({ onClose }) => {
   };
 
   const inviteUsers = () => {
+    if (!emails.trim()) {
+      toast({
+        title: "Please enter at least one email",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     const emailsArray = emails.split(",").map((email) => email.trim());
     emailsArray.forEach((email) => sendInvitation(email, selectedRole));
+    
+    toast({
+      title: "Invitations Sent",
+      description: `Sent ${emailsArray.length} invitation(s)`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+    
+    setEmails("");
+    setSelectedRole(null);
+  };
+
+  const handleAddRole = () => {
+    if (roleInput.trim() && !roles.includes(roleInput.trim())) {
+      setRoles([...roles, roleInput.trim()]);
+      setRoleInput("");
+    }
+  };
+
+  const handleRemoveRole = (roleToRemove) => {
+    setRoles(roles.filter(role => role !== roleToRemove));
   };
 
   useEffect(() => {
@@ -89,131 +177,226 @@ const CreateWorkspaceModal = ({ onClose }) => {
   }, [step, workspaceId]);
 
   const handleDone = () => {
-    navigate(`/workspace/${workspaceId}/chats`);
+    setIsOpen(false);
+    if (workspaceId) {
+      navigate(`/workspace/${workspaceId}/chats`);
+    }
   };
 
-  const [showPopup, setShowPopup] = useState(false);
-
-  const [showCreateWorkspace, setShowCreateWorkspace] = useState(false);
-
-  const handleCreateWorkspace = () => {
-    setShowCreateWorkspace(true);
+  const handleOpen = () => {
+    setIsOpen(true);
+    setStep(1);
+    setWorkspaceName("");
+    setRoles([]);
+    setRoleInput("");
+    setSelectedRole(null);
+    setEmails("");
+    setWorkspaceId(null);
   };
 
-  const handleClose = () => {
-    setShowCreateWorkspace(false);
+  const handleModalClose = () => {
+    setIsOpen(false);
+    setStep(1);
   };
 
   return (
-    <div className="">
-      {showPopup && (
-        <div className="popup">
-          <h2>Workspace Created!</h2>
-          <p>Your workspace has been successfully created.</p>
-          <button onClick={() => setShowPopup(false)}>Close</button>
-        </div>
-      )}
-      <div className="">
-        <Button
-          bg="#05549e"
-          color="white"
-          zIndex={1}
-          alignItems="center"
-          justifyContent="center"
-          rounded={10}
-          onClick={handleCreateWorkspace}
-          _hover={{ textColor: "#05549e", bg: "white" }}
-        >
-          Create Workspace
-        </Button>
-      </div>
-      {showCreateWorkspace && (
-        <div className="modal_background">
-          <div className="modal">
-            <div className="modal_content">
-              {step === 1 && (
-                <div>
-                  <h2>Create Workspace</h2>
-                  <div className="workspace_holder">
-                    <div className="input-group">
-                      <label htmlFor="workspaceName">Workspace Name</label>
-                      <input
-                        id="workspaceName"
-                        type="text"
-                        placeholder="Workspace Name"
-                        value={workspaceName}
-                        onChange={(e) => setWorkspaceName(e.target.value)}
-                      />
-                    </div>
-                    <div className="input-group">
-                      <label htmlFor="addRole">Add Role</label>
-                      <input
-                        id="addRole"
-                        type="text"
-                        placeholder="Add Role"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            setRoles([...roles, e.target.value]);
-                            e.target.value = "";
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className="input-group">
-                      <label>Role List</label>
-                      <div className="role-container">
-                        <ol className="iskima">
-                          {roles.map((role, index) => (
-                            <li className="role-item" key={index}>
-                              {role}
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="workspace_btn">
-                    <button onClick={createWorkspace}>Next</button>
-                  </div>
-                </div>
-              )}
+    <>
+      <Button
+        bg="#21364A"
+        color="white"
+        alignItems="center"
+        justifyContent="center"
+        rounded={10}
+        onClick={handleOpen}
+        _hover={{ bg: "#192937ff" }}
+      >
+        Create Workspace
+      </Button>
 
-              {step === 2 && (
-                <div>
-                  <h2>Invite Users</h2>
-                  <ul>
+      <Modal size="lg" isOpen={isOpen} onClose={handleModalClose} isCentered>
+        <ModalOverlay bg="blackAlpha.700" />
+        <ModalContent
+          pb={4}
+          pt={1}
+          bg="#0F1924"
+          color="white"
+          border="1px solid"
+          borderColor="#2982db20"
+        >
+          <ModalHeader color="white">
+            {step === 1 ? "Create Workspace" : "Invite Users"}
+          </ModalHeader>
+          <ModalCloseButton color="white" _hover={{ bg: "#21364A" }} />
+          <ModalBody>
+            {step === 1 && (
+              <Stack spacing={4}>
+                <FormControl isRequired>
+                  <FormLabel color="gray.300">Workspace Name</FormLabel>
+                  <Input
+                    placeholder="Enter workspace name"
+                    value={workspaceName}
+                    onChange={(e) => setWorkspaceName(e.target.value)}
+                    bg="#0F1924"
+                    borderColor="#2982db20"
+                    color="white"
+                    _placeholder={{ color: "gray.400" }}
+                    _hover={{ borderColor: "#2982db40" }}
+                    _focus={{
+                      borderColor: "#21364A",
+                      boxShadow: "0 0 0 1px #21364A",
+                      bg: "#131f2bff",
+                    }}
+                  />
+                </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel color="gray.300">Add Roles</FormLabel>
+                  <HStack>
+                    <Input
+                      placeholder="Enter role name"
+                      value={roleInput}
+                      onChange={(e) => setRoleInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddRole();
+                        }
+                      }}
+                      bg="#0F1924"
+                      borderColor="#2982db20"
+                      color="white"
+                      _placeholder={{ color: "gray.400" }}
+                      _hover={{ borderColor: "#2982db40" }}
+                      _focus={{
+                        borderColor: "#21364A",
+                        boxShadow: "0 0 0 1px #21364A",
+                        bg: "#131f2bff",
+                      }}
+                    />
+                    <Button
+                      onClick={handleAddRole}
+                      bg="#21364A"
+                      color="white"
+                      _hover={{ bg: "#192937ff" }}
+                      flexShrink={0}
+                    >
+                      Add
+                    </Button>
+                  </HStack>
+                </FormControl>
+
+                {roles.length > 0 && (
+                  <Box>
+                    <FormLabel color="gray.300" mb={2}>Roles Added</FormLabel>
+                    <HStack spacing={2} flexWrap="wrap">
+                      {roles.map((role, index) => (
+                        <Tag
+                          key={index}
+                          size="md"
+                          bg="#21364A"
+                          color="white"
+                          borderRadius="full"
+                        >
+                          <TagLabel>{role}</TagLabel>
+                          <TagCloseButton onClick={() => handleRemoveRole(role)} />
+                        </Tag>
+                      ))}
+                    </HStack>
+                  </Box>
+                )}
+
+                <Button
+                  bg="#21364A"
+                  color="white"
+                  _hover={{ bg: "#192937ff" }}
+                  _active={{ bg: "#192937ff" }}
+                  onClick={createWorkspace}
+                  mt={4}
+                >
+                  Create & Continue
+                </Button>
+              </Stack>
+            )}
+
+            {step === 2 && (
+              <Stack spacing={4}>
+                <Box>
+                  <FormLabel color="gray.300" mb={3}>Select Role to Invite Users</FormLabel>
+                  <List spacing={2}>
                     {roleList.map((role, index) => (
-                      <li key={index}>
-                        {role.roleName}{" "}
-                        <button onClick={() => setSelectedRole(role.roleName)}>
-                          Invite
-                        </button>
-                      </li>
+                      <ListItem
+                        key={index}
+                        p={3}
+                        cursor="pointer"
+                        bg={selectedRole === role.roleName ? "#21364A" : "#0F1924"}
+                        borderRadius="md"
+                        border="1px solid"
+                        borderColor="#2982db20"
+                        _hover={{ bg: "#21364A" }}
+                        onClick={() => setSelectedRole(role.roleName)}
+                      >
+                        <Text color="white">{role.roleName}</Text>
+                      </ListItem>
                     ))}
-                  </ul>
-                  {selectedRole && (
-                    <div>
-                      <h3>Invite Users to {selectedRole}</h3>
-                      <input
-                        type="text"
+                  </List>
+                </Box>
+
+                {selectedRole && (
+                  <Box
+                    p={4}
+                    bg="#0F1924"
+                    borderRadius="md"
+                    border="1px solid"
+                    borderColor="#2982db20"
+                  >
+                    <FormControl>
+                      <FormLabel color="gray.300">
+                        Invite Users to {selectedRole}
+                      </FormLabel>
+                      <Input
                         placeholder="Enter emails separated by commas"
                         value={emails}
                         onChange={(e) => setEmails(e.target.value)}
+                        bg="#0F1924"
+                        borderColor="#2982db20"
+                        color="white"
+                        _placeholder={{ color: "gray.400" }}
+                        _hover={{ borderColor: "#2982db40" }}
+                        _focus={{
+                          borderColor: "#21364A",
+                          boxShadow: "0 0 0 1px #21364A",
+                          bg: "#131f2bff",
+                        }}
                       />
-                      <button onClick={inviteUsers}>Send Invitations</button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="modal_button">
-              <button onClick={handleClose}>Close</button>
-              <button onClick={handleDone}>Done</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+                      <Button
+                        mt={3}
+                        bg="#21364A"
+                        color="white"
+                        _hover={{ bg: "#192937ff" }}
+                        onClick={inviteUsers}
+                      >
+                        Send Invitations
+                      </Button>
+                    </FormControl>
+                  </Box>
+                )}
+
+                <Button
+                  bg="#21364A"
+                  color="white"
+                  _hover={{ bg: "#192937ff" }}
+                  _active={{ bg: "#192937ff" }}
+                  onClick={handleDone}
+                  mt={4}
+                >
+                  Done
+                </Button>
+              </Stack>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
