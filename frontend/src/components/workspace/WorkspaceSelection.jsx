@@ -20,97 +20,86 @@ const WorkspaceSelection = () => {
   };
 
   return (
-    <div className="workspace_main">
-     
-        <div>
-          <Box 
+    <Flex
+      minHeight="100vh"
+      width="100%"
+      align="center"
+      justify="center"
+      bg="#0f1924"
+    >
+
+      <div>
+        <Box
           width={"90vw"}>
 
           <Flex
-              position={"relative"}
-              top="0"
-              left="0"
-              right="0"
-              margin="0 auto"
-              direction={"column"}
-              justifyContent="center"
+            bg="#1b3046ff"
+            p={8}
+            borderRadius="lg"
+            boxShadow="lg"
+            position={"relative"}
+            top="0"
+            left="0"
+            right="0"
+            margin="0 auto"
+            direction={"column"}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <div className="flex items-center justify-center ">
+              <div className="workspace_content_heading text-white ">
+                Introducing ComConnect:
+                <p className="workspace_content_description w-[700px] ">Revolutionizing college communities by
+                  connecting students, allocating roles based on preferences, and
+                  creating teams that feel like family. Empower collaboration and
+                  enhance productivity with comConnect! <br /> To create or join a workspace use the buttons below</p>
+              </div>
+              <div className="workspace_img_container">
+                <img className="workspace_img" src="/images/workspace.png" alt="workspace" />
+              </div>
+            </div>
+            <Box
+              width={["90%", "90%", "90%", "70%"]}
+              p={8}
+              display="flex"
               alignItems="center"
+              justifyItems="center"
+              justifyContent="space-around"
             >
-            <Flex
-              position={"relative"}
-              top="0"
-              left="0"
-              right="0"
-              margin="0 auto"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Text
-                fontFamily="Arial"
-                fontSize={["12vw", "6vw", "120px"]}
-                fontWeight="900"
-                lineHeight={["9vw", "7vw", "180px"]}
-                textAlign="left"
-                bg="linear-gradient(0deg, rgba(0, 122, 255, 0.15), rgba(0, 122, 255, 0.15)), linear-gradient(0deg, #CBDCF3, #CBDCF3)"
-                bgClip="text"
-                color="transparent"
-                zIndex={2}
-              >
-                COM
-              </Text>
-              <Text
-                fontFamily="Arial"
-                fontSize={["12vw", "6vw", "120px"]}
-                fontWeight="900"
-                lineHeight={["9vw", "7vw", "180px"]}
-                textAlign="left"
-                color="transparent"
-                padding="0 8px"
-                sx={{
-                  WebkitTextStroke: "2.47px rgba(203, 220, 243, 1)",
-                  WebkitTextFillColor: "transparent",
-                }}
-                zIndex={2}
-              >
-                CONNECT
-              </Text>
-              
-            </Flex>
-            <div className="workspace_lol">
-          <CreateWorkspaceModal>Create Workspace</CreateWorkspaceModal>
-        </div>
-        <div className="join_workspace_modal translucent-box">
-          <JoinWorkspaceModal>
-            <div className="join_workspace_btn">Join Workspace</div>
-          </JoinWorkspaceModal>
-          <div className="join_workspace_lol">
-            {Array.isArray(userWorkspaces) && userWorkspaces.length > 0 ? (
-              userWorkspaces.map((workspace) => (
-                <Button
-                  className="cnt"
-                  key={workspace._id}
-                  onClick={() => handleSelectWorkspace(workspace)}
-                >
-                  {workspace.workspaceName}
-                </Button>
-              ))
-            ) : (
-              <Box>
-                <div className="simple">"No workspaces available"</div>
-              </Box>
-            )}
-          </div>
-        </div>
-        </Flex>
-          
-           
-          </Box>
-        </div>
+              <CreateWorkspaceModal>Create Workspace</CreateWorkspaceModal>
+              <JoinWorkspaceModal>
+                <div className="bg-[#05549e] text-white px-3 py-2 cursor-pointer hover:bg-white hover:text-[#05549e] transition-colors font-[600] z-1 rounded-lg ">
+                  Join Workspace
+                </div>
+              </JoinWorkspaceModal>
+              <div className="h-fit">
+                {Array.isArray(userWorkspaces) && userWorkspaces.length > 0 ? (
+                  userWorkspaces.map((workspace) => (
+                    <Button
+                      className="cnt"
+                      key={workspace._id}
+                      onClick={() => handleSelectWorkspace(workspace)}
+                    >
+                      {workspace.workspaceName}
+                    </Button>
+                  ))
+                ) : (
+                  <Box>
+                    <div className="simple">"No workspaces available"</div>
+                  </Box>
+                )}
+              </div>
+            </Box>
+          </Flex>
 
-       
-        
-      
-    </div>
+
+        </Box>
+      </div>
+
+
+
+
+    </Flex>
 
   );
 };

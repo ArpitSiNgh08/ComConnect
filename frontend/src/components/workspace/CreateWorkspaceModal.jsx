@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { workspace } from "../../utils/media/media";
 import "./workspace.css";
 import { API_URL } from "../../config/api.config";
+import { Button } from "@chakra-ui/button";
 
 const CreateWorkspaceModal = ({ onClose }) => {
   const [step, setStep] = useState(1);
@@ -104,7 +105,7 @@ const CreateWorkspaceModal = ({ onClose }) => {
   };
 
   return (
-    <div className="workspace_page">
+    <div className="">
       {showPopup && (
         <div className="popup">
           <h2>Workspace Created!</h2>
@@ -112,33 +113,19 @@ const CreateWorkspaceModal = ({ onClose }) => {
           <button onClick={() => setShowPopup(false)}>Close</button>
         </div>
       )}
-      <div className="workspace_display">
-        <div className="workspace_content">
-          <div className="workspace_content_heading">
-            Create a new ComConnect Workspace
-
-            
-              <button
-                className="create_workspace_btn"
-                onClick={handleCreateWorkspace}
-              >
-                Create Workspace
-              </button>
-          
-          </div>
-          
-          <div className="workspace_content_description">
-            Introducing ComConnect: Revolutionizing college communities by
-            connecting students, allocating roles based on preferences, and
-            creating teams that feel like family. Empower collaboration and
-            enhance productivity with comConnect! to create a workspace click on
-            the button below
-    
-          </div>
-        </div>
-        <div className="workspace_img_container">
-          <img className="workspace_img" src="/images/workspace.png" alt="workspace" />
-        </div>
+      <div className="">
+        <Button
+          bg="#05549e"
+          color="white"
+          zIndex={1}
+          alignItems="center"
+          justifyContent="center"
+          rounded={10}
+          onClick={handleCreateWorkspace}
+          _hover={{ textColor: "#05549e", bg: "white" }}
+        >
+          Create Workspace
+        </Button>
       </div>
       {showCreateWorkspace && (
         <div className="modal_background">
